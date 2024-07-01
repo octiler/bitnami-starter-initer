@@ -153,7 +153,7 @@ cat << 'EOF' | sed -i -e '/range .Values.ingress.extraHosts/e cat' templates/ing
           {{- toYaml .Values.ingress.extraPaths | nindent 10 }}
           {{- end }}
           - path: {{ .Values.ingress.path }}
-            {{- if eq "true" (include "common.ingress.supportPathType" .) }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
             pathType: {{ .Values.ingress.pathType }}
             {{- end }}
             backend: {{- include "common.ingress.backend" (dict "serviceName" (include "common.names.fullname" .) "servicePort" "<PLACEHOLDER_PORT_NAME>" "context" $) | nindent 14 }}
@@ -164,11 +164,11 @@ sed -i -e '/range .Values.ingress.extraHosts/{N;s/\.name/default (printf "%s.%s"
 
 sed -i -e '/\$ingressNSMatchLabels/s//.Values.networkPolicy.ingressNSMatchLabels/;/\$ingressNSPodMatchLabels/s//.Values.networkPolicy.ingressNSPodMatchLabels/' templates/networkpolicy.yaml
 
-sed -i -e '/<PLACEHOLDER_HATCHER>_DEBUG/{N;s/\.Values\.images\.debug/.Values.<PLACEHOLDER_REGULAR_CHARTNAME>.image.debug/}' templates/statefulset.yaml
-sed -i -e '/<PLACEHOLDER_HATCHER>_DEBUG/{N;s/\.Values\.images\.debug/.Values.<PLACEHOLDER_REGULAR_CHARTNAME>.image.debug/}' templates/daemonset.yaml
+sed -i -e '/<PLACEHOLDER_HATCHER>_DEBUG/{N;s/\.Values\.image\.debug/.Values.<PLACEHOLDER_REGULAR_CHARTNAME>.image.debug/}' templates/statefulset.yaml
+sed -i -e '/<PLACEHOLDER_HATCHER>_DEBUG/{N;s/\.Values\.image\.debug/.Values.<PLACEHOLDER_REGULAR_CHARTNAME>.image.debug/}' templates/daemonset.yaml
 
-sed -i -e '/%%commons%%/s//commands/' templates/statefulset.yaml
-sed -i -e '/%%commons%%/s//commands/' templates/daemonset.yaml
+sed -i -e '/%%commands%%/s//commands/' templates/statefulset.yaml
+sed -i -e '/%%commands%%/s//commands/' templates/daemonset.yaml
 
 sed -i -e '/ \{10\}env:$/{N;N;N;N;s/\n \{12\}- name: foo\n \{14\}value: bar$//}' templates/deployment.yaml
 sed -i -e '/ \{10\}env:$/{N;N;N;N;s/\n \{12\}- name: foo\n \{14\}value: bar$//}' templates/statefulset.yaml
@@ -267,13 +267,13 @@ cat << 'EOF' | sed -i -e '$r /dev/stdin' templates/configmap.yaml
 {{- end }}
 EOF
 
-cat << 'EOF' | sed -i -e '/^            - name: empty-dir/e cat' templates/deployment.yaml
+cat << 'EOF' | sed -i -e '/^ \{12\}- name: empty-dir/e cat' templates/deployment.yaml
             - name: config
               mountPath: /config
               readOnly: true
 EOF
 
-cat << 'EOF' | sed -i -e '/^        - name: empty-dir/e cat' templates/deployment.yaml
+cat << 'EOF' | sed -i -e '/^ \{8\}- name: empty-dir/e cat' templates/deployment.yaml
         - name: config
           configMap:
             name: {{ include "common.names.fullname" . }}
@@ -283,7 +283,7 @@ EOF
 sed -i -e '/servicePort/s/http/<PLACEHOLDER_PORT_NAME>/' templates/ingress.yaml
 sed -i -e '/\.Values\.ingress\.hostname/s//( include "<PLACEHOLDER_REGULAR_CHARTNAME>.ingress.hostname" . )/' templates/ingress.yaml
 
-cat << 'EOF' | sed -i -e '/^## %%SECONDARY_CONTAINER\/POD_DESCRIPTION%%/e cat' values.yaml
+cat << 'EOF' | sed -i -e '/^## %%SECONDARY_CONTAINER\/POD_DESCRIPTION%%$/e cat' values.yaml
 clusterRoleBinding:
   create: false
 
