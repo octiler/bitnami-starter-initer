@@ -130,6 +130,13 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: ingress-auth-{{ .Release.Name }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: <CHARTNAME>
+  {{- if or .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
 type: Opaque
 data:
   {{- if .Values.ingress.auth.secret }}
